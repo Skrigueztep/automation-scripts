@@ -21,30 +21,9 @@ DIR_TO_BACKUP="/opt/lampp/htdocs"
 DATE=$(date +%d-%m-%Y)
 TIME=$(date +"%T")
 
-# Validate if Database backup.config file exist
-if [ ! -f "$HOME/backup.config" ]; then
-  echo "Move backup.config file to $HOME"
-  exit
-fi
-
-if [ "$(stat -c "%a" "$HOME/backup.config")" != "600" ]; then
-  echo "You need assign 600 permission to backup.config file"
-  exit
-fi
-
-# Validate Backup directory existance
-if [ ! -d "$HOME/backup" ]; then
-  mkdir "$HOME/backup"
-fi
-
-# Validate Backup Log file existance
-if [ ! -f "$HOME/backup-script.log" ]; then
-  touch "$HOME/backup-script.log"
-fi
-
 # Array with wordpress blogs names
 BLOGS=(
-  "wordpress"
+  "skrigueztep"
 )
 
 DIRECTORIES=(
@@ -58,11 +37,35 @@ for i in "${BLOGS[@]}";
 do
   DIR_NAME=$i
 
+  # Validate if Database backup.config file exist
+  if [ ! -f "$HOME/backup.config" ]; then
+    echo "Move backup.config file to $HOME"
+    exit
+  fi
+
+  if [ "$(stat -c "%a" "$HOME/backup.config")" != "600" ]; then
+    echo "You need assign 600 permission to backup.config file"
+    exit
+  fi
+
+  # Validate Backup directory existance
+  if [ ! -d "$HOME/backup" ]; then
+    mkdir "$HOME/backup"
+    echo "Backup directory created"
+  fi
+
+  # Validate Backup Log file existance
+  if [ ! -f "$HOME/backup-script.log" ]; then
+    touch "$HOME/backup-script.log"
+    echo "Backup log file created"
+  fi
+
   echo "DATABASE BACKUP IN PROCESS..."
   # This should create a database backup of the blog'
-  # TODO: Validate successful execution (2>&1)
-  DB_TEST=$(mysqldump -u root "$i" -i | zip -9 > "$BACKUP_DIR/backup/$DIR_NAME-backup-$TIME-$DATE.sql.zip")
-  if [ ! "$DB_TEST" ]; then
+  # TODO: Validate successful execution
+  # DB_TEST=$(mysqldump -u root --databases "$i" -i | zip -9 > "$BACKUP_DIR/backup/$DIR_NAME-backup-$TIME-$DATE.sql.zip")
+  DB_TEST=$(mysqldump -u root --databases "EXAMPLE" > "$BACKUP_DIR/backup/$DIR_NAME-backup-$TIME-$DATE.sql")
+  if [ "$DB_TEST" ]; then
      echo "Error at execution mysqldump"
      exit
   fi
@@ -77,24 +80,21 @@ do
     if [ ! -d "$DIR_TO_BACKUP/$DIR_NAME/wp-content/$index" ]; then
       echo "$DIR_NAME/wp-content/$index directory not exist"
     else
-      zip -9 -r -q "$BACKUP_DIR/$DIR_NAME/wp-content/$index.zip" "$DIR_TO_BACKUP/$DIR_NAME/$index"
+      if [ ! -d "$HOME/backup/$DIR_NAME" ]; then
+        mkdir -p "$HOME/backup/$DIR_NAME"
+      fi
+      zip -9 -r -q "$HOME/backup/$DIR_NAME/$index.zip" "$DIR_TO_BACKUP/$DIR_NAME/wp-content/$index"
       # TODO: Validate successful execution, if this were to fail, delete "$DIR_TO_BACKUP/$DIR_NAME" directory and exit
     fi
   done
 
   for directory in "${DIRECTORIES[@]}"
   do
-    if [ ! -f "$BACKUP_DIR/$DIR_NAME/wp-content/$directory.zip" ]; then
-      echo "$BACKUP_DIR/$DIR_NAME/wp-content/$directory.zip file not exist"
+    if [ ! -f "$BACKUP_DIR/backup/$DIR_NAME/$directory.zip" ]; then
+      echo "$BACKUP_DIR/backup/$DIR_NAME/$directory.zip file not exist"
       exit
     fi
   done
-
-  # TODO: Validate successful execution on each zip
-  zip -9 -r -q "$BACKUP_DIR/backup/$DIR_NAME.zip" "$DIR_TO_BACKUP/$DIR_NAME"
-  if [ ! -f "$BACKUP_DIR/backup/$DIR_NAME.zip" ]; then
-    exit
-  fi
 
   echo "Backup at $DIR_NAME already";
 
@@ -136,8 +136,6 @@ fi
 echo "TERMINATING..."
 # Print log: https://askubuntu.com/questions/103643/cannot-echo-hello-x-txt-even-with-sudo
 echo "Backup $DATE generated at $TIME" | tee -a "$HOME/backup-script.log"
-rm "$BACKUP_DIR/backup/$DIR_NAME.zip"
-rm "$BACKUP_DIR/backup/compĺete-backup-$TIME-$DATE.sql.zip"
-rm "$HOME/backup"
+rm -rf "$HOME/backup"
 echo "TERMINATE"
 exit 0
