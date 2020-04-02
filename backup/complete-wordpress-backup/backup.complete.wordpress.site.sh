@@ -78,6 +78,15 @@ do
       echo "$DIR_NAME/wp-content/$index directory not exist"
     else
       zip -9 -r -q "$BACKUP_DIR/$DIR_NAME/wp-content/$index.zip" "$DIR_TO_BACKUP/$DIR_NAME/$index"
+      # TODO: Validate successful execution, if this were to fail, delete "$DIR_TO_BACKUP/$DIR_NAME" directory and exit
+    fi
+  done
+
+  for directory in "${DIRECTORIES[@]}"
+  do
+    if [ ! -f "$BACKUP_DIR/$DIR_NAME/wp-content/$directory.zip" ]; then
+      echo "$BACKUP_DIR/$DIR_NAME/wp-content/$directory.zip file not exist"
+      exit
     fi
   done
 
