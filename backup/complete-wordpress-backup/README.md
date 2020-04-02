@@ -13,7 +13,10 @@
     - backup.config <br>
     <br>
 2.- Change .sh and .config files permissions to 600 <br>
-3.- Change credentials on .config file to your owns
+3.- Change credentials on .config file to your owns <br>
+4.- Change DIR_TO_BACKUP for your wordpress sites location <br>
+5.- Changes BLOGS for yuor sites to backup <br>
+    Ej: BLOGS=( "site1" "site2" "site3" ... )
 
 Note: <br>
 ONLY ON UBUNTU SYSTEM <br>
