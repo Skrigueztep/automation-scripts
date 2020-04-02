@@ -98,32 +98,6 @@ do
 
   echo "Backup at $DIR_NAME already";
 
-  # if [ ! -d "$DIR_TO_BACKUP/$DIR_NAME/wp-content/languages" ]; then
-  #   echo "wp-content/languages directory not exist for $DIR_NAME"
-  # else
-  #   zip -9 -r -q "$BACKUP_DIR/$DIR_NAME/wp-content/languages.zip" "$DIR_TO_BACKUP/$DIR_NAME/languages"
-  # fi
-
-  # if [ ! -d "$DIR_TO_BACKUP/$DIR_NAME/wp-content/plugins" ]; then
-  #   echo "wp-content/plugins directory not exist for $DIR_NAME"
-  #   exit
-  # else
-  #   zip -9 -r -q "$BACKUP_DIR/$DIR_NAME/wp-content/plugins.zip" "$DIR_TO_BACKUP/$DIR_NAME/plugins"
-  # fi
-
-  # if [ ! -d "$DIR_TO_BACKUP/$DIR_NAME/wp-content/themes" ]; then
-  #   echo "wp-content/themes directory not exist for $DIR_NAME"
-  #   exit
-  # else
-  #   zip -9 -r -q "$BACKUP_DIR/$DIR_NAME/wp-content/themes.zip" "$DIR_TO_BACKUP/$DIR_NAME/themes"
-  # fi
-
-  # if [ ! -d "$DIR_TO_BACKUP/$DIR_NAME/wp-content/uploads" ]; then
-  #   echo "wp-content/themes directory not exist for $DIR_NAME"
-  #   exit
-  # else
-  #   zip -9 -r -q "$BACKUP_DIR/$DIR_NAME/wp-content/uploads.zip" "$DIR_TO_BACKUP/$DIR_NAME/uploads"
-  # fi
 done
 
 echo "CREATING ZIP OF BACKUP..."
