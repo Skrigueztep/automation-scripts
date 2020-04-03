@@ -74,7 +74,7 @@ do
   echo "DATABASE BACKUP IN PROCESS..."
   # This should create a database backup of the blog'
   # TODO: Validate successful execution
-  # DB_TEST=$(mysqldump -u root --databases "$i" -i | zip -9 > "$BACKUP_DIR/backup/$DIR_NAME-backup-$TIME-$DATE.sql.zip")
+  # DB_TEST=$(mysqldump -u root -padmin --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME-backup-$TIME-$DATE.sql")
   DB_TEST=$(mysqldump -u root --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME-backup-$TIME-$DATE.sql")
   if [ "$DB_TEST" ]; then
      echo "Error at execution mysqldump"
@@ -114,6 +114,7 @@ done
 echo "CREATING ZIP OF BACKUP..."
 zip -9 -r -q "backup-$DATE.zip" "backup"
 if [ ! -f "backup-$DATE.zip" ];then
+  rm -rf "$HOME/backup"
   echo "backup-$DATE.zip not created"
   exit
 fi
