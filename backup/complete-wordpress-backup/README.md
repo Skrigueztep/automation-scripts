@@ -1,5 +1,9 @@
 # Complete Wordpress Backup
 
+# NOTE
+
+    If you try to run this script and not work, try run it from $HOME
+
 # Requirements
 
 1.- Wordpress Installed & configured <br>
