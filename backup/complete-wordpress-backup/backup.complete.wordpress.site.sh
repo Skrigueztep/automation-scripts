@@ -3,7 +3,7 @@
 ###           Complete Wordpress Backup
 ###
 ###   Author: Israel Olvera
-###   Version: 1.0
+###   Version: 1.1
 ###
 ###   Notes:
 ###     To run successfully this script you need that you wordpress blog
@@ -60,11 +60,22 @@ do
     echo "Backup log file created"
   fi
 
+  if [ ! -f "$DIR_TO_BACKUP/$DIR_NAME/wp-config.php" ];then
+    echo "wp-config.php cannot read beacuse this not exist"
+    echo "YOU NEED REINSTALL YOUR BLOG"
+    exit
+  fi
+
+  # Read wp-config.php file to get blog DB credentials:
+  # https://stackoverflow.com/questions/7586995/read-variables-from-wp-config-php
+  DB_NAME=$(cat "$DIR_TO_BACKUP/$DIR_NAME/wp-config.php" | grep DB_NAME | cut -d \' -f 4)
+  echo "$DB_NAME"
+
   echo "DATABASE BACKUP IN PROCESS..."
   # This should create a database backup of the blog'
   # TODO: Validate successful execution
   # DB_TEST=$(mysqldump -u root --databases "$i" -i | zip -9 > "$BACKUP_DIR/backup/$DIR_NAME-backup-$TIME-$DATE.sql.zip")
-  DB_TEST=$(mysqldump -u root --databases "EXAMPLE" > "$BACKUP_DIR/backup/$DIR_NAME-backup-$TIME-$DATE.sql")
+  DB_TEST=$(mysqldump -u root --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME-backup-$TIME-$DATE.sql")
   if [ "$DB_TEST" ]; then
      echo "Error at execution mysqldump"
      exit
