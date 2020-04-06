@@ -1,28 +1,34 @@
 # Complete Wordpress Backup
 
-# NOTE
+This script save the following directories of your blogs:
 
-    If you try to run this script and not work, try run it from $HOME
+    wp-content/languages
+    wp-content/themes
+    wp-content/plugins
+    wp-content/uploads
+    
+then it make a blog db dump
+
+# Notes
+
+    If you want execute this script, do the following:
+    
+    backup.complete.wordpress.site.sh <site1-path> <site2-path>
+    
+    The paths cannot contain the last slash at the end:
+    CORRECT: /home/user/sites/site1
+    BAD:    /home/user/sites/site1/
 
 # Requirements
 
 1.- Wordpress Installed & configured <br>
-2.- At least one wordpress blog <br>
-3.- Wordpress blog DB named equal blog
+2.- Have at least one wordpress blog <br>
 
 # Instructions
 
-1.- Copy the following files to $HOME <br>
-    - backup.complete.wordpress.site.sh <br>
-    - backup.config <br>
-    <br>
-2.- Change .sh and .config files permissions to 600 <br>
-3.- Change credentials on .config file to your owns <br>
-4.- Change DIR_TO_BACKUP for your wordpress sites location <br>
-5.- Changes BLOGS for yuor sites to backup <br>
-    Ej: BLOGS=( "site1" "site2" "site3" ... )
+1.- Change .sh permissions to 755 <br>
 
 Note: <br>
 ONLY ON UBUNTU SYSTEM <br>
 If it doesn't work run: <br>
-<b>sudo -H -u <user> $HOME/backup.complete.wordpress.site.sh</b>
+<b>sudo -H -u user path/backup.complete.wordpress.site.sh</b>
