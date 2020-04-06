@@ -3,28 +3,24 @@
 ###           Complete Wordpress Backup
 ###
 ###   Author: Israel Olvera
-###   Version: 1.1
+###   Version: 2.0
 ###
-###   Notes:
-###     To run successfully this script you need that you wordpress blog
-###     directory and your wordpress database name be the same.
+###   NOTES:
+###     This version cannot require backup.config file, and not require modify the script
+###     To execute:   backup.complete.wordpress.site.sh <site1-path> <site2-path>
+###     At the end of each path no add the last /, example: /home/user/sites/site1
 ###
 ##########################################
 
 # Directory to store backup
 BACKUP_DIR="$HOME"
 
-# Aditional directory path to backup
-# DIR_TO_BACKUP="/var/www/html"
-DIR_TO_BACKUP="/opt/lampp/htdocs"
-
 DATE=$(date +%d-%m-%Y)
 TIME=$(date +"%T")
 
-# Array with wordpress blogs names
-BLOGS=(
-  "skrigueztep"
-)
+YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
+RED='\033[0;31m'
 
 DIRECTORIES=(
   "languages"
@@ -33,95 +29,111 @@ DIRECTORIES=(
   "uploads"
 )
 
-for i in "${BLOGS[@]}";
-do
-  DIR_NAME=$i
+function backup() {
+  COUNTER=0
 
-  # Validate if Database backup.config file exist
-  if [ ! -f "$HOME/backup.config" ]; then
-    echo "Move backup.config file to $HOME"
-    exit
-  fi
-
-  if [ "$(stat -c "%a" "$HOME/backup.config")" != "600" ]; then
-    echo "You need assign 600 permission to backup.config file"
-    exit
-  fi
-
-  # Validate Backup directory existance
-  if [ ! -d "$HOME/backup" ]; then
-    mkdir "$HOME/backup"
-    echo "Backup directory created"
-  fi
-
-  # Validate Backup Log file existance
-  if [ ! -f "$HOME/backup-script.log" ]; then
-    touch "$HOME/backup-script.log"
-    echo "Backup log file created"
-  fi
-
-  if [ ! -f "$DIR_TO_BACKUP/$DIR_NAME/wp-config.php" ];then
-    echo "wp-config.php cannot read beacuse this not exist"
-    echo "YOU NEED REINSTALL YOUR BLOG"
-    exit
-  fi
-
-  # Read wp-config.php file to get blog DB credentials:
-  # https://stackoverflow.com/questions/7586995/read-variables-from-wp-config-php
-  DB_NAME=$(cat "$DIR_TO_BACKUP/$DIR_NAME/wp-config.php" | grep DB_NAME | cut -d \' -f 4)
-  echo "$DB_NAME"
-
-  echo "DATABASE BACKUP IN PROCESS..."
-  # This should create a database backup of the blog'
-  # TODO: Validate successful execution
-  # DB_TEST=$(mysqldump -u root -padmin --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME-backup-$TIME-$DATE.sql")
-  DB_TEST=$(mysqldump -u root --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME-backup-$TIME-$DATE.sql")
-  if [ "$DB_TEST" ]; then
-     echo "Error at execution mysqldump"
-     exit
-  fi
-
-  echo "DIRECTORY BACKUP..."
-  # This shuold create a .zip of directory compressed
-  # Validate if each directory exist
-  # Zip all important wordpress directories
-
-  for index in "${DIRECTORIES[@]}"
+  ################################### Validate wordpress directory ##############################################
+  # Iterate parameters: https://unix.stackexchange.com/questions/129072/whats-the-difference-between-and
+  for i in "$@";
   do
-    if [ ! -d "$DIR_TO_BACKUP/$DIR_NAME/wp-content/$index" ]; then
-      echo "$DIR_NAME/wp-content/$index directory not exist"
-    else
-      if [ ! -d "$HOME/backup/$DIR_NAME" ]; then
-        mkdir -p "$HOME/backup/$DIR_NAME"
+    if [ -d "$i" ]; then
+      if [ ! -d "$i/wp-content" ];then
+        echo -e "${YELLOW} $i is not a wordpress directory";
+        COUNTER=$((COUNTER+1))
       fi
-      zip -9 -r -q "$HOME/backup/$DIR_NAME/$index.zip" "$DIR_TO_BACKUP/$DIR_NAME/wp-content/$index"
-      # TODO: Validate successful execution, if this were to fail, delete "$DIR_TO_BACKUP/$DIR_NAME" directory and exit
+    else
+      echo "${YELLOW} $i not exist";
+      COUNTER=$((COUNTER+1))
     fi
   done
 
-  for directory in "${DIRECTORIES[@]}"
-  do
-    if [ ! -f "$BACKUP_DIR/backup/$DIR_NAME/$directory.zip" ]; then
-      echo "$BACKUP_DIR/backup/$DIR_NAME/$directory.zip file not exist"
-      exit
+  if [ $COUNTER -eq 0 ];then
+    ###################################### INITIAL VALIDAITONs ##################################################
+    # Validate Backup directory existance
+    if [ ! -d "$BACKUP_DIR/backup" ]; then
+      mkdir "$BACKUP_DIR/backup"
+      echo -e "${GREEN} Backup directory created"
     fi
-  done
 
-  echo "Backup at $DIR_NAME already";
+    # Validate Backup Log file existance
+    if [ ! -f "$BACKUP_DIR/backup-script.log" ]; then
+      touch "$BACKUP_DIR/backup-script.log"
+      echo -e "${GREEN} Backup log file created"
+    fi
 
-done
+    if [ ! -f "$i/wp-config.php" ];then
+       echo -e "${YELLOW} $i/wp-config.php cannot read beacuse this not exist"
+       echo -e "${RED} YOU NEED REINSTALL YOUR BLOG"
+       exit 2
+    fi
 
-echo "CREATING ZIP OF BACKUP..."
-zip -9 -r -q "backup-$DATE.zip" "backup"
-if [ ! -f "backup-$DATE.zip" ];then
-  rm -rf "$HOME/backup"
-  echo "backup-$DATE.zip not created"
-  exit
-fi
+    for path in "$@";
+    do
+      ####################################################################################################################
+      # Read wp-config.php file to get blog DB credentials:
+      # https://stackoverflow.com/questions/7586995/read-variables-from-wp-config-php
+      DB_NAME=$(cat "$path/wp-config.php" | grep DB_NAME | cut -d \' -f 4);
 
-echo "TERMINATING..."
-# Print log: https://askubuntu.com/questions/103643/cannot-echo-hello-x-txt-even-with-sudo
-echo "Backup $DATE generated at $TIME" | tee -a "$HOME/backup-script.log"
-rm -rf "$HOME/backup"
-echo "TERMINATE"
-exit 0
+      # Get last directory of a path
+      # https://stackoverflow.com/questions/10986794/remove-part-of-path-on-unix
+      DIR_NAME=$(echo "$path" | rev | cut -d'/' -f-1 | rev)
+
+      # This should create a database backup of the blog'
+      # TODO: Validate successful execution
+      echo -e "${YELLOW} DATABASE BACKUP IN PROCESS..."
+      # mysqldump -u root -padmin --databases "$DB_NAME" > "$i.sql"
+      mysqldump -u root --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME-backup-$TIME-$DATE.sql"
+      if [ ! -f "$BACKUP_DIR/backup/$DIR_NAME-backup-$TIME-$DATE.sql" ]; then
+         echo -e "${RED} Error at execution mysqldump"
+         exit 2
+      fi
+      echo -e "${GREEN} DB of ${DIR_NAME} saved!"
+      echo -e "${YELLOW} DIRECTORY BACKUP..."
+      # This shuold create a .zip of directory compressed
+      # Validate if each directory exist
+      # Zip all important wordpress directories
+      for index in "${DIRECTORIES[@]}"
+      do
+        if [ ! -d "$path/wp-content/$index" ]; then
+          echo -e "${RED} $path directory not exist"
+        else
+          if [ ! -d "$BACKUP_DIR/backup/$DIR_NAME" ]; then
+            mkdir -p "$BACKUP_DIR/backup/$DIR_NAME"
+          fi
+          cd "$path/wp-content/" && zip -9 -r -q "$BACKUP_DIR/backup/$DIR_NAME/$index.zip" "$index"
+          echo "$path/wp-content/$index > $BACKUP_DIR/backup/$DIR_NAME/$index.zip"
+          # TODO: Validate successful execution, if this were to fail, delete "$DIR_TO_BACKUP/$DIR_NAME" directory and exit
+        fi
+      done
+
+      for directory in "${DIRECTORIES[@]}"
+      do
+        if [ ! -f "$BACKUP_DIR/backup/$DIR_NAME/$directory.zip" ]; then
+          echo "$BACKUP_DIR/backup/$DIR_NAME/$directory.zip file not exist"
+          exit 2
+        fi
+      done
+
+      echo -e "${GREEN} Backup at $DIR_NAME already";
+    done
+    echo -e "${YELLOW} CREATING ZIP OF BACKUP..."
+
+    cd "$BACKUP_DIR" && zip -9 -r -q "backup-$DATE.zip" "backup/"
+    if [ ! -f "$BACKUP_DIR/backup-$DATE.zip" ];then
+      rm -rf "$BACKUP_DIR/backup"
+      echo "backup-$DATE.zip not created"
+      exit 2
+    fi
+
+    echo -e "${YELLOW} TERMINATING..."
+    # Print log: https://askubuntu.com/questions/103643/cannot-echo-hello-x-txt-even-with-sudo
+    echo "Backup $DATE generated at $TIME" | tee -a "$BACKUP_DIR/backup-script.log"
+    rm -rf "$BACKUP_DIR/backup"
+    echo -e "${YELLOW} TERMINATE"
+    exit 0
+  else
+    exit 2
+  fi
+}
+
+backup "$@";
