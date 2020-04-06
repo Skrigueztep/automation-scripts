@@ -32,6 +32,11 @@ DIRECTORIES=(
 function backup() {
   COUNTER=0
 
+  if [ $# -eq 0 ];then
+    echo -e "${RED} No parameters passed"
+    exit 1
+  fi
+
   ################################### Validate wordpress directory ##############################################
   # Iterate parameters: https://unix.stackexchange.com/questions/129072/whats-the-difference-between-and
   for i in "$@";
