@@ -3,7 +3,7 @@
 ###           Complete Wordpress Backup
 ###
 ###   Author: Israel Olvera
-###   Version: 2.0
+###   Version: 2.1
 ###
 ###   NOTES:
 ###     This version cannot require backup.config file, and not require modify the script
@@ -118,7 +118,7 @@ function backup() {
           exit 2
         fi
       done
-
+      cp "$path/wp-config.php" "$BACKUP_DIR/backup/$DIR_NAME";
       echo -e "${GREEN} Backup at $DIR_NAME already";
     done
     echo -e "${YELLOW} CREATING ZIP OF BACKUP..."
