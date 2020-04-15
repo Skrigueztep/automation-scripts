@@ -1,11 +1,14 @@
 # Complete Wordpress Backup
 
+    Current Version: 2.1
+
 This script save the following directories of your blogs:
 
     wp-content/languages
     wp-content/themes
     wp-content/plugins
     wp-content/uploads
+    wp-config.php
     
 then it make a blog db dump
 
