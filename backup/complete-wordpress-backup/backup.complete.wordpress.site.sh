@@ -3,7 +3,7 @@
 ###           Complete Wordpress Backup
 ###
 ###   Author: Israel Olvera
-###   Version: 2.1
+###   Version: 2.2
 ###
 ###   NOTES:
 ###     This version cannot require backup.config file, and not require modify the script
@@ -83,16 +83,16 @@ function backup() {
       # https://stackoverflow.com/questions/10986794/remove-part-of-path-on-unix
       DIR_NAME=$(echo "$path" | rev | cut -d'/' -f-1 | rev)
 
+      if [ ! -d "$BACKUP_DIR/backup/$DIR_NAME" ]; then
+          mkdir -p "$BACKUP_DIR/backup/$DIR_NAME"
+      fi
       # This should create a database backup of the blog'
       # TODO: Validate successful execution
       echo -e "${YELLOW} DATABASE BACKUP IN PROCESS..."
-      # mysqldump -u root -padmin --databases "$DB_NAME" > "$i.sql"
-      mysqldump -u root --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME-backup-$TIME-$DATE.sql"
-      if [ ! -f "$BACKUP_DIR/backup/$DIR_NAME-backup-$TIME-$DATE.sql" ]; then
-         echo -e "${RED} Error at execution mysqldump"
-         exit 2
-      fi
+      # mysqldump -u root -padmin --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME/$DIR_NAME-backup-$TIME-$DATE.sql" 2>&1 && echo -e "${RED} Error at execution mysqldump";
+      mysqldump -u root --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME/$DIR_NAME-backup-$TIME-$DATE.sql" 2>&1 && echo -e "${RED} Error at execution mysqldump";
       echo -e "${GREEN} DB of ${DIR_NAME} saved!"
+
       echo -e "${YELLOW} DIRECTORY BACKUP..."
       # This shuold create a .zip of directory compressed
       # Validate if each directory exist
@@ -102,9 +102,6 @@ function backup() {
         if [ ! -d "$path/wp-content/$index" ]; then
           echo -e "${RED} $path directory not exist"
         else
-          if [ ! -d "$BACKUP_DIR/backup/$DIR_NAME" ]; then
-            mkdir -p "$BACKUP_DIR/backup/$DIR_NAME"
-          fi
           cd "$path/wp-content/" && zip -9 -r -q "$BACKUP_DIR/backup/$DIR_NAME/$index.zip" "$index"
           echo "$path/wp-content/$index > $BACKUP_DIR/backup/$DIR_NAME/$index.zip"
           # TODO: Validate successful execution, if this were to fail, delete "$DIR_TO_BACKUP/$DIR_NAME" directory and exit
@@ -118,6 +115,7 @@ function backup() {
           exit 2
         fi
       done
+
       cp "$path/wp-config.php" "$BACKUP_DIR/backup/$DIR_NAME";
       echo -e "${GREEN} Backup at $DIR_NAME already";
     done
