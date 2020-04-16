@@ -1,6 +1,6 @@
 # Complete Wordpress Backup
 
-    Current Version: 2.1
+    Current Version: 2.2
 
 This script save the following directories of your blogs:
 
