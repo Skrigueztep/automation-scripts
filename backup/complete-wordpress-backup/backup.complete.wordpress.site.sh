@@ -109,7 +109,7 @@ function backup() {
           echo -e "${RED} $path directory not exist"
         else
           cd "$path/wp-content/" && zip -9 -r -q "$BACKUP_DIR/backup/$DIR_NAME/$index.zip" "$index"
-          echo "$path/wp-content/$index > $BACKUP_DIR/backup/$DIR_NAME/$index.zip"
+          echo -e "${YELLOW} $path/wp-content/$index > $BACKUP_DIR/backup/$DIR_NAME/$index.zip"
           # TODO: Validate successful execution, if this were to fail, delete "$DIR_TO_BACKUP/$DIR_NAME" directory and exit
         fi
       done
