@@ -56,10 +56,17 @@ function restore_wordpress() {
         echo -e "${GREEN} Wordpress directories unzipped";
         echo -e "${YELLOW} Restoring DB for $i";
         DB_FILE=$(ls "$LOCATION_PATH/backup/$i" | grep .sql);
-        # mysql -u root --password admin < "$LOCATION_PATH/backup/$i/$DB_FILE" 2>&1 && echo -e "${GREEN} DB Restored";
-        DUMP=$(mysql -u root --password"" < "$LOCATION_PATH/backup/$i/$DB_FILE" 2>&1)
-        echo "Dump $DUMP";
-        echo -e "${GREEN} DB Restored";
+
+        if [ -d "/opt/lampp/" ];then
+          DUMP=$(/opt/lampp/bin/mysql -u root --password"" < "$LOCATION_PATH/backup/$i/$DB_FILE" 2>&1)
+          echo "Dump $DUMP";
+          echo -e "${GREEN} DB Restored";
+        else
+          # mysql -u root --password admin < "$LOCATION_PATH/backup/$i/$DB_FILE" 2>&1 && echo -e "${GREEN} DB Restored";
+          DUMP=$(mysql -u root --password"" < "$LOCATION_PATH/backup/$i/$DB_FILE" 2>&1)
+          echo "Dump $DUMP";
+          echo -e "${GREEN} DB Restored";
+        fi
       fi
     done
     echo -e "${YELLOW} TERMINATING...";

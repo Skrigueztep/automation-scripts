@@ -3,7 +3,7 @@
 ###           Complete Wordpress Backup
 ###
 ###   Author: Israel Olvera
-###   Version: 2.2
+###   Version: 2.3
 ###
 ###   NOTES:
 ###     This version cannot require backup.config file, and not require modify the script
@@ -89,9 +89,15 @@ function backup() {
       # This should create a database backup of the blog'
       # TODO: Validate successful execution
       echo -e "${YELLOW} DATABASE BACKUP IN PROCESS..."
-      # mysqldump -u root -padmin --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME/$DIR_NAME-backup-$TIME-$DATE.sql" 2>&1 && echo -e "${RED} Error at execution mysqldump";
-      mysqldump -u root --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME/$DIR_NAME-backup-$TIME-$DATE.sql" 2>&1 && echo -e "${RED} Error at execution mysqldump";
-      echo -e "${GREEN} DB of ${DIR_NAME} saved!"
+
+      if [ -d "/opt/lampp/" ];then
+        /opt/lampp/bin/mysqldump -u root --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME/$DIR_NAME-backup-$TIME-$DATE.sql" 2>&1 && echo -e "${RED} Error at execution mysqldump";
+      else
+        # mysqldump -u root -padmin --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME/$DIR_NAME-backup-$TIME-$DATE.sql" 2>&1 && echo -e "${RED} Error at execution mysqldump";
+        mysqldump -u root --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME/$DIR_NAME-backup-$TIME-$DATE.sql" 2>&1 && echo -e "${RED} Error at execution mysqldump";
+        echo -e "${GREEN} DB of ${DIR_NAME} saved!"
+      fi
+
 
       echo -e "${YELLOW} DIRECTORY BACKUP..."
       # This shuold create a .zip of directory compressed
