@@ -10,7 +10,10 @@ This script save the following directories of your blogs:
     wp-content/uploads
     wp-config.php
     
-then it make a blog db dump
+then it make a blog db dump. <br>
+
+    LOG -> $HOME/backup-script.log | Shows all dates of all backups made
+    BACKUP Files -> $HOME | All backups save here
 
 # Notes
 
