@@ -91,11 +91,23 @@ function backup() {
       echo -e "${YELLOW} DATABASE BACKUP IN PROCESS..."
 
       if [ -d "/opt/lampp/" ];then
-        /opt/lampp/bin/mysqldump -u root --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME/$DIR_NAME-backup-$TIME-$DATE.sql" 2>&1 && echo -e "${RED} Error at execution mysqldump";
+        # DUMP$(/opt/lampp/bin/mysqldump -u root -padmin --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME/$DIR_NAME-backup-$TIME-$DATE.sql" 2>&1);
+        DB_DUMP=$(/opt/lampp/bin/mysqldump -u root --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME/$DIR_NAME-backup-$TIME-$DATE.sql" 2>&1);
+        if [ ! -z "$DUMP" ];then
+          echo -e "${RED} Dump $DUMP";
+          exit 2
+        else
+          echo -e "${GREEN} DB Restored";
+        fi
       else
-        # mysqldump -u root -padmin --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME/$DIR_NAME-backup-$TIME-$DATE.sql" 2>&1 && echo -e "${RED} Error at execution mysqldump";
-        mysqldump -u root --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME/$DIR_NAME-backup-$TIME-$DATE.sql" 2>&1 && echo -e "${RED} Error at execution mysqldump";
-        echo -e "${GREEN} DB of ${DIR_NAME} saved!"
+        # DUMP$(mysqldump -u root -padmin --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME/$DIR_NAME-backup-$TIME-$DATE.sql" 2>&1);
+        DUMP=$(mysqldump -u root --databases "$DB_NAME" > "$BACKUP_DIR/backup/$DIR_NAME/$DIR_NAME-backup-$TIME-$DATE.sql" 2>&1)
+        if [ ! -z "$DUMP" ];then
+          echo -e "${RED} Dump $DUMP";
+          exit 2
+        else
+          echo -e "${GREEN} DB Restored";
+        fi
       fi
 
 
@@ -106,7 +118,7 @@ function backup() {
       for index in "${DIRECTORIES[@]}"
       do
         if [ ! -d "$path/wp-content/$index" ]; then
-          echo -e "${RED} $path directory not exist"
+          echo -e "${RED} $path/wp-content/$index directory not exist"
         else
           cd "$path/wp-content/" && zip -9 -r -q "$BACKUP_DIR/backup/$DIR_NAME/$index.zip" "$index"
           echo -e "${YELLOW} $path/wp-content/$index > $BACKUP_DIR/backup/$DIR_NAME/$index.zip"
@@ -118,7 +130,6 @@ function backup() {
       do
         if [ ! -f "$BACKUP_DIR/backup/$DIR_NAME/$directory.zip" ]; then
           echo "$BACKUP_DIR/backup/$DIR_NAME/$directory.zip file not exist"
-          exit 2
         fi
       done
 
