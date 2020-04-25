@@ -7,7 +7,7 @@
 ###   Version: 2.0
 ###
 ###   NOTES:
-###     To execute:   restore.backup.wordpress.sh <backup file path>.zip <wordpress sites path>
+###     To execute:   wordpress-restore.sh <backup file path>.zip <wordpress sites path>
 ###     No add a least / in wordpress sites path, will be occur an error
 ###
 ##########################################
