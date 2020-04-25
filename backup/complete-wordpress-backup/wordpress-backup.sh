@@ -7,7 +7,7 @@
 ###
 ###   NOTES:
 ###     This version cannot require backup.config file, and not require modify the script
-###     To execute:   backup.complete.wordpress.site.sh <site1-path> <site2-path>
+###     To execute:   wordpress-backup.sh <site1-path> <site2-path>
 ###     At the end of each path no add the last /, example: /home/user/sites/site1
 ###
 ##########################################
