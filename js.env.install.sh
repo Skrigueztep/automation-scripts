@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ########################################################################
-###                   Development Environment Installation
+###                   JS Environment Installation
 ###
 ###   Author: Israel Olvera
 ###   Version: 1.0
