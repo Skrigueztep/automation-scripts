@@ -19,7 +19,22 @@ function help() {
 function server_installation() {
   echo "Installing net-tools" && sudo apt install -y net-tools && echo -e "${GREEN} Net-tools Installed" &&
   echo "Installing ssh" && sudo apt install -y openssh-server && echo -e "${GREEN} SSH Installed" &&
-  echo "Installing NodeJS" && sudo apt-install -y nodejs && echo -e "${GREEN} NodeJS Installed";
+  echo "Installing NodeJS" && sudo apt install -y nodejs && echo -e "${GREEN} NodeJS Installed";
+  echo "What web server do want install Apache or NGINX? (apache | nginx)";
+  read -r web_server
+  case $web_server in
+   'apache')
+   echo "Installing Apache" && sudo apt install -y apache2 && sudo systemctl enable apache2 && echo -e "${GREEN} Apache Installed";
+    ;;
+    'nginx')
+   echo "Installing NGINX" && sudo apt install -y nginx && sudo systemctl enable nginx && echo -e "${GREEN} NGINX Installed";
+    ;;
+  esac
+  echo "Do you want install MongoDB? (yes | no)";
+  read -r database;
+  if [ "$database" == "yes" ];then
+    sudo apt install -y mongodb && sudo systemctl enable mongodb;
+  fi
 }
 
 function development_environment() {
