@@ -19,6 +19,7 @@ function help() {
 function server_installation() {
   echo "Installing net-tools" && sudo apt install -y net-tools && echo -e "${GREEN} Net-tools Installed" &&
   echo "Installing ssh" && sudo apt install -y openssh-server && echo -e "${GREEN} SSH Installed" &&
+  # TODO: Add NodeJS vX (Different version at default of repository): https://www.digitalocean.com/community/tutorials/como-instalar-node-js-en-ubuntu-18-04-es
   echo "Installing NodeJS" && sudo apt install -y nodejs && echo -e "${GREEN} NodeJS Installed";
   echo "What web server do want install Apache or NGINX? (apache | nginx)";
   read -r web_server
